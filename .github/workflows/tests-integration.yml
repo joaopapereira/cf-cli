@@ -24,6 +24,11 @@ on:
       - "Tests"
     types:
       - completed
+  push:
+    branches:
+      - main
+      - v8
+      - v7
 
 jobs:
   run-integration-tests-cf-env:
@@ -75,4 +80,3 @@ jobs:
       os: ubuntu-latest
       name: cats
     secrets: inherit
-  
