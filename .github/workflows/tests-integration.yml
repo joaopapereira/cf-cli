@@ -20,6 +20,12 @@ on:
           # - run-integration-tests-cf-env-with-min-capi
           # - run-integration-windows
           # - run-integration-windows-client-credentials
+  push:
+    branches:
+      - main
+      - v8
+      - v7
+
 jobs:
   run-integration-tests-cf-env:
     name: Integration tests
