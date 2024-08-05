@@ -46,10 +46,10 @@ jobs:
             echo "::set-output name=ref::${{github.event.workflow_run.head_sha}}"
           fi
   units:
-    name: Units
+    name: Basic unit gate for integration tests
     runs-on: ubuntu-latest
     needs:
-      - get-sh
+      - get-sha
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,7 +65,7 @@ jobs:
   run-integration-tests-cf-env:
     name: Integration tests
     needs:
-      - get-sh
+      - get-sha
       - units
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
@@ -80,7 +80,7 @@ jobs:
   run-integration-tests-cf-env-with-client-creds:
     name: client creds
     needs:
-      - get-sh
+      - get-sha
       - units
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
@@ -95,7 +95,7 @@ jobs:
   # run-integration-tests-cf-env-with-min-capi:
   #   name: MIN CAPI
   #   needs:
-  #     - get-sh
+  #     - get-sha
   #     - units
   #   if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
   #   uses: ./.github/workflows/tests-integration-reusable.yml
@@ -112,7 +112,7 @@ jobs:
   run-cats-cf-env:
     name: CATS
     needs:
-      - get-sh
+      - get-sha
       - run-integration-tests-cf-env
       - run-integration-tests-cf-env-with-client-creds
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
