@@ -60,7 +60,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ job.get-sha.gitRef }}
+          ref: ${{needs.get-sha.outputs.gitRef}}
       - name: Set Up Go
         uses: actions/setup-go@v5
         with:
