@@ -94,6 +94,7 @@ integration-global-shared: integration-shared-global
 integration-shared-global: build install-test-deps integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are shared between v6 and v7
 	$(ginkgo_int) integration/shared/global
 
+
 ivg: integration-versioned-global
 integration-global-versioned: integration-versioned-global
 integration-versioned-global: build install-test-deps integration-cleanup ## Serially run integration tests that make cross-cutting changes to their test CF foundation and are specific to your CLI version
