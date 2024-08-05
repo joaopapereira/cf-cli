@@ -43,7 +43,7 @@ jobs:
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
-        ref: ${{input.gitRef}}
+        ref: ${{inputs.gitRef}}
 
     - name: Checkout cli-ci
       uses: actions/checkout@v4
