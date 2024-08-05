@@ -16,10 +16,12 @@ on:
           # - run-integration-tests-cf-env-with-min-capi
           - run-cats-cf-env
   push:
-    tags:
-      - "v9.*"
-      - "v8.*"
-      - "v7.*"
+#    tags:
+#      - "v9.*"
+#      - "v8.*"
+#      - "v7.*"
+      branches:
+        - "main"
   pull_request_target:
     branches:
       - main
@@ -38,12 +40,16 @@ jobs:
     steps:
       - id: calculate
         run: |
+          echo "the event: ${{github.event_name}}"
           if [[ ${{ github.event_name == 'pull_request_target' }} ]]; then
-            echo "::set-output name=ref::${{ github.event.pull_request.head.sha }}"
+            echo "checkout pull request head ${{ github.event.pull_request.head.sha }}"
+            echo "ref=${{ github.event.pull_request.head.sha }}" >> $GITHUB_OUTPUT
           elif [[ ${{ github.event_name == 'push' }} ]]; then
-            echo "::set-output name=ref::${{ github.event.push.after }}"
+            echo "checkout push request ${{ github.event.pull_request.head.sha }}"
+            echo "ref=${{github.event.push.after}}" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=ref::${{github.event.workflow_run.head_sha}}"
+            echo "checkout else ${{ github.event.workflow_run.head_sha }}"
+            echo "ref=${{github.event.workflow_run.head_sha}}" >> $GITHUB_OUTPUT
           fi
   units:
     name: Basic unit gate for integration tests
