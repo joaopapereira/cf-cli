@@ -67,7 +67,7 @@ jobs:
     needs:
       - get-sh
       - units
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
@@ -82,7 +82,7 @@ jobs:
     needs:
       - get-sh
       - units
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
@@ -97,7 +97,7 @@ jobs:
   #   needs:
   #     - get-sh
   #     - units
-  #   if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
+  #   if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-min-capi' }}
   #   uses: ./.github/workflows/tests-integration-reusable.yml
   #   with:
   #     capi-version: min
@@ -115,7 +115,7 @@ jobs:
       - get-sh
       - run-integration-tests-cf-env
       - run-integration-tests-cf-env-with-client-creds
-    if: ${{ inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
       capi-version: edge
