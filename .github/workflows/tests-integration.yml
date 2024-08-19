@@ -116,8 +116,8 @@ jobs:
     name: CATS
     needs:
       - get-sha
-      - run-integration-tests-cf-env
-      - run-integration-tests-cf-env-with-client-creds
+#      - run-integration-tests-cf-env
+#      - run-integration-tests-cf-env-with-client-creds
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-cats-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
     with:
