@@ -250,7 +250,7 @@ jobs:
     needs:
       - claim-env
       - run-cats-cf-env
-    if: always()
+    if: ${{ always() && !runner.debug }}
     steps:
       - name: unclaim
         env:
