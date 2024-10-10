@@ -62,7 +62,6 @@ name: 'Release: Bump GPG'
 
 on:
   workflow_dispatch:
-    inputs:
 
 permissions:
   contents: write
