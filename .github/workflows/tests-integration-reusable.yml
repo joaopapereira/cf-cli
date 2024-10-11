@@ -34,6 +34,14 @@ jobs:
     runs-on: ${{ inputs.os }} 
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     steps:
+
+
+    # TODO: revert
+    - name: DEBUG
+      run: |
+        apt install nodejs --yes
+
+
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
@@ -62,6 +70,7 @@ jobs:
     - name: Install Tools
       env:
         account_token: ${{ secrets.SHEPHERD_SERVICE_ACCOUNT_TOKEN }}
+        namespace:     ${{ vars.POOL_NAMESPACE || 'tas-devex' }}
       run: |
         go version
 
@@ -95,7 +104,7 @@ jobs:
         apt-get install -y build-essential unzip
 
         shepherd login service-account ${account_token}
-        shepherd get lease ${{ inputs.lease-id }} --namespace tas-devex --json | jq .output > metadata.json
+        shepherd get lease ${{ inputs.lease-id }} --namespace ${namespace} --json | jq .output > metadata.json
 
     - name: Add CATS config
       if: ${{ inputs.name == 'cats' }}
@@ -193,6 +202,7 @@ jobs:
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
       run: |
+<<<<<<< HEAD
         ENV=$(cat metadata.json | jq -r '.name')
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
@@ -213,6 +223,12 @@ jobs:
         make build
 
         export CF_PASSWORD=${CF_INT_PASSWORD}
+=======
+
+        export GOPATH="$PWD/go"
+        export PATH="$PWD/out:$GOPATH/bin:$PATH"
+
+>>>>>>> b32319dc1 (update devenv)
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 
