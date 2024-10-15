@@ -35,13 +35,6 @@ jobs:
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     steps:
 
-
-    # TODO: revert
-    - name: DEBUG
-      run: |
-        apt install nodejs --yes
-
-
     - name: Checkout cli
       uses: actions/checkout@v4
       with:
