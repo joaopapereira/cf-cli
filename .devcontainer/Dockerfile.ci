@@ -1,0 +1,37 @@
+FROM golang:latest
+
+# Install Go language tools
+RUN go install github.com/onsi/ginkgo/v2/ginkgo@latest && \
+    go install github.com/onsi/gomega/...@latest
+
+RUN apt-get update && apt-get install -y wget
+
+# Install BOSH CLI
+RUN wget https://github.com/cloudfoundry/bosh-cli/releases/download/v7.1.2/bosh-cli-7.1.2-linux-amd64 -O /usr/local/bin/bosh && \
+    chmod +x /usr/local/bin/bosh
+
+# Install CredHub CLI
+RUN wget https://github.com/cloudfoundry-incubator/credhub-cli/releases/download/2.9.10/credhub-linux-2.9.10.tgz && \
+    tar xzf credhub-linux-2.9.10.tgz && \
+    mv credhub /usr/local/bin/ && \
+    rm credhub-linux-2.9.10.tgz
+
+# Install UAA CLI
+RUN wget https://github.com/cloudfoundry/uaa-cli/releases/download/0.10.0/uaa-linux-amd64-0.10.0 -O /usr/local/bin/uaa && \
+    chmod +x /usr/local/bin/uaa
+
+# Install CF CLI
+RUN wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | apt-key add - && \
+    echo "deb https://packages.cloudfoundry.org/debian stable main" | tee /etc/apt/sources.list.d/cloudfoundry-cli.list && \
+    apt-get update && \
+    apt-get install -y cf8-cli
+
+# Install Node.js for github actions
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install -y nodejs
+
+# Copy shepherd binary from the specified image
+COPY --from=us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest /usr/local/bin/shepherd /usr/local/bin/shepherd
+
+# Add shepherd to PATH
+ENV PATH="/usr/local/bin:${PATH}"

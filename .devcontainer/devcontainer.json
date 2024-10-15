@@ -5,7 +5,7 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	// "image": "mcr.microsoft.com/devcontainers/base:jammy",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile.dev"
   },
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {},
