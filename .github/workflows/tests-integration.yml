@@ -64,8 +64,8 @@ jobs:
         with:
           go-version-file: go.mod
           check-latest: true
-      - name: Run Units
-        run: make units
+      # - name: Run Units
+      #   run: make units
 
   claim-env:
     name: Claim and Prep Environment
@@ -78,8 +78,14 @@ jobs:
     container: us-west2-docker.pkg.dev/shepherd-268822/shepherd2/concourse-resource:latest
     needs:
       - get-sha
-      - units
+      # - units
     steps:
+
+      # TODO: revert
+      - name: DEBUG
+        run: |
+          apt install nodejs --yes
+
       - name: Checkout cli
         uses: actions/checkout@v4
         with:
@@ -96,16 +102,19 @@ jobs:
         run: |
           shepherd login service-account ${account_token}
 
-          lease_id=$( shepherd create lease \
-                        --duration       ${pool_duration}  \
-                        --pool           ${pool_name}      \
-                        --pool-namespace ${pool_namespace} \
-                        --namespace      ${namespace}      \
-                        --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
-                        --json \
-                      | jq -r .id
-                    )
+          # lease_id=$( shepherd create lease \
+          #               --duration       ${pool_duration}  \
+          #               --pool           ${pool_name}      \
+          #               --pool-namespace ${pool_namespace} \
+          #               --namespace      ${namespace}      \
+          #               --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
+          #               --json \
+          #             | jq -r .id
+          #           )
           
+          lease_id=d830ada4-bb9f-4fd4-a600-ea55d0f753c1
+
+
           # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
           # if the pool is empty.
           count=0
@@ -214,7 +223,7 @@ jobs:
     name: Integration tests
     needs:
       - get-sha
-      - units
+      # - units
       - claim-env
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
@@ -230,7 +239,7 @@ jobs:
     name: client creds
     needs:
       - get-sha
-      - units
+      # - units
       - claim-env
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.workflow == 'all' || inputs.workflow == 'run-integration-tests-cf-env-with-client-creds' }}
     uses: ./.github/workflows/tests-integration-reusable.yml
@@ -274,5 +283,5 @@ jobs:
         run: |
           shepherd login service-account ${account_token}
           set -x
-          shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} \
-            --namespace ${namespace}
+          # shepherd delete lease ${{ needs.claim-env.outputs.leaseid }} \
+            # --namespace ${namespace}

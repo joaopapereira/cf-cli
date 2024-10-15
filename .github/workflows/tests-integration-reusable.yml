@@ -202,7 +202,6 @@ jobs:
     - name: Run Integration Tests
       if: ${{ !inputs.run-with-client-creds  &&  inputs.name != 'cats' }}
       run: |
-<<<<<<< HEAD
         ENV=$(cat metadata.json | jq -r '.name')
         jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${ENV}.priv
         eval "$(bbl print-env --metadata-file ./metadata.json)"
@@ -223,12 +222,7 @@ jobs:
         make build
 
         export CF_PASSWORD=${CF_INT_PASSWORD}
-=======
 
-        export GOPATH="$PWD/go"
-        export PATH="$PWD/out:$GOPATH/bin:$PATH"
-
->>>>>>> b32319dc1 (update devenv)
         cf api ${CF_INT_API} --skip-ssl-validation
         cf auth
 
