@@ -42,6 +42,21 @@ env:
   SHEPHERD_LEASE_ID: ${{ vars.SHEPHERD_LEASE_ID }}
 
 jobs:
+
+  playground:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo Hi
+          echo $SHEPHERD_LEASE_ID
+
+          if [[ -z $SHEPHERD_LEASE_ID ]]; then
+            echo "true is empty $SHEPHERD_LEASE_ID "
+          else
+            echo "false $SHEPHERD_LEASE_ID "
+          fi
+
+
   get-sha:
     runs-on: ubuntu-latest
     outputs:
@@ -76,7 +91,7 @@ jobs:
           check-latest: true
       - name: Run Units
         run: |
-          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+          if [[ -z $SHEPHERD_LEASE_ID ]]; then
             make units
           fi
 
@@ -110,9 +125,7 @@ jobs:
         run: |
           shepherd login service-account ${account_token}
 
-          if [[ -n $SHEPHERD_LEASE_ID ]]; then
-            lease_id=$SHEPHERD_LEASE_ID
-          else
+          if [[ -z $SHEPHERD_LEASE_ID ]]; then
             lease_id=$( shepherd create lease \
                           --duration       ${pool_duration}  \
                           --pool           ${pool_name}      \
@@ -122,6 +135,8 @@ jobs:
                           --json \
                         | jq -r .id
                       )
+          else
+            lease_id=$SHEPHERD_LEASE_ID
           fi
 
           echo "Shepherd lease ID: ${lease_id}"
@@ -198,7 +213,7 @@ jobs:
           env_name=$(jq -r .name metadata.json)
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
 
-          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+          if [[ -z $SHEPHERD_LEASE_ID ]]; then
             bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
           fi
 
@@ -227,7 +242,7 @@ jobs:
             -v client-secret="${{ secrets.CLIENT_SECRET }}" \
             > ./director.yml
 
-          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+          if [[ -z $SHEPHERD_LEASE_ID ]]; then
             bosh -d cf deploy director.yml -n
           fi
           echo "Deployed CAPI version:"
