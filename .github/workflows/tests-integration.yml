@@ -37,6 +37,10 @@ on:
       - ".grype.yaml"
       - ".git*"
       - ".golangci.json"
+
+env:
+  SHEPHERD_LEASE_ID: ${{ vars.SHEPHERD_LEASE_ID }}
+
 jobs:
   get-sha:
     runs-on: ubuntu-latest
@@ -71,7 +75,10 @@ jobs:
           go-version-file: go.mod
           check-latest: true
       - name: Run Units
-        run: make units
+        run: |
+          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+            make units
+          fi
 
   claim-env:
     name: Claim and Prep Environment
@@ -103,15 +110,21 @@ jobs:
         run: |
           shepherd login service-account ${account_token}
 
-          lease_id=$( shepherd create lease \
-                        --duration       ${pool_duration}  \
-                        --pool           ${pool_name}      \
-                        --pool-namespace ${pool_namespace} \
-                        --namespace      ${namespace}      \
-                        --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
-                        --json \
-                      | jq -r .id
-                    )
+          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+            lease_id=$SHEPHERD_LEASE_ID
+          else
+            lease_id=$( shepherd create lease \
+                          --duration       ${pool_duration}  \
+                          --pool           ${pool_name}      \
+                          --pool-namespace ${pool_namespace} \
+                          --namespace      ${namespace}      \
+                          --description "Claimed by CF CLI workflow ${{ github.workflow_run.url }}" \
+                          --json \
+                        | jq -r .id
+                      )
+          fi
+
+          echo "Shepherd lease ID: ${lease_id}"
 
           # Give sometime for the lease to complete. Shepherd may take upto an 3 hours to create an env
           # if the pool is empty.
@@ -175,8 +188,7 @@ jobs:
         env:
           capi_release_version: ${{ vars.CAPI_RELEASE_VERSION }}
         run: |
-          if [ -z "$capi_release_version" ]
-          then
+          if [ -z "$capi_release_version" ]; then
             capi_release_version=$(curl -s https://api.github.com/repos/cloudfoundry/capi-release/releases/latest | jq -r .tag_name)
           fi
           
@@ -186,7 +198,9 @@ jobs:
           env_name=$(jq -r .name metadata.json)
           jq -r .bosh.jumpbox_private_key metadata.json > /tmp/${env_name}.priv
 
-          bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
+          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+            bosh upload-release "https://bosh.io/d/github.com/cloudfoundry/capi-release?v=$capi_release_version"
+          fi
 
       - name: Checkout cf-deployment
         uses: actions/checkout@v4
@@ -213,7 +227,9 @@ jobs:
             -v client-secret="${{ secrets.CLIENT_SECRET }}" \
             > ./director.yml
 
-          bosh -d cf deploy director.yml -n
+          if [[ -n $SHEPHERD_LEASE_ID ]]; then
+            bosh -d cf deploy director.yml -n
+          fi
           echo "Deployed CAPI version:"
           bosh -d cf releases | grep capi
 
