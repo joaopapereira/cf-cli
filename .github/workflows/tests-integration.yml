@@ -265,6 +265,7 @@ jobs:
       name: Integration
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      lease-namespace: ${{ inputs.lease_namespace }}
       nodes: ${{ inputs.nodes }}
     secrets: inherit
 
@@ -282,6 +283,7 @@ jobs:
       name: Integration client creds
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      lease-namespace: ${{ inputs.lease_namespace }}
     secrets: inherit
 
   run-cats-cf-env:
@@ -299,6 +301,7 @@ jobs:
       name: cats
       gitRef: ${{needs.get-sha.outputs.gitRef}}
       lease-id: ${{ needs.claim-env.outputs.leaseid }}
+      lease-namespace: ${{ inputs.lease_namespace }}
     secrets: inherit
 
   unclaim-env:
