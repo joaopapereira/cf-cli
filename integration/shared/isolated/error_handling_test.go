@@ -10,16 +10,16 @@ import (
 
 var _ = Describe("curl command", func() {
 	It("returns the expected request", func() {
-		session := helpers.CF("curl", "/v2/banana")
-		Eventually(session).Should(Say(`"error_code":"CF-NotFound"`))
+		session := helpers.CF("curl", "/v3/banana")
+		Eventually(session).Should(Say(`"title":"CF-NotFound"`))
 		Eventually(session).Should(Exit(0))
 	})
 
 	When("using -v", func() {
 		It("returns the expected request with verbose output", func() {
-			session := helpers.CF("curl", "-v", "/v2/banana")
-			Eventually(session).Should(Say("GET /v2/banana HTTP/1.1"))
-			Eventually(session).Should(Say(`"error_code": "CF-NotFound"`))
+			session := helpers.CF("curl", "-v", "/v3/banana")
+			Eventually(session).Should(Say("GET /v3/banana HTTP/1.1"))
+			Eventually(session).Should(Say(`"title": "CF-NotFound"`))
 			Eventually(session).Should(Exit(0))
 		})
 	})
